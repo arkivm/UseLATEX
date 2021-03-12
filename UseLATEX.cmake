@@ -922,6 +922,11 @@ function(latex_setup_variables)
     DOC "The pdf to ps converter program from the Poppler package."
     )
 
+  find_program(INKSCAPE_CONVERTER
+    NAMES inkscape
+    DOC "Inkscape to export the drawing area to pdf"
+    )
+
   find_program(HTLATEX_COMPILER
     NAMES htlatex
     PATHS ${MIKTEX_BINARY_PATH}
@@ -940,6 +945,7 @@ function(latex_setup_variables)
     PDFTOPS_CONVERTER
     LATEX2HTML_CONVERTER
     HTLATEX_COMPILER
+    INKSCAPE_CONVERTER
     )
 
   latex_needit(LATEX_COMPILER latex)
@@ -951,6 +957,7 @@ function(latex_setup_variables)
   latex_wantit(DVIPS_CONVERTER dvips)
   latex_wantit(PS2PDF_CONVERTER ps2pdf)
   latex_wantit(PDFTOPS_CONVERTER pdftops)
+  latex_wantit(INKSCAPE_CONVERTER inkscape)
 
   set(LATEX_COMPILER_FLAGS "-interaction=batchmode -file-line-error"
     CACHE STRING "Flags passed to latex.")
@@ -1202,6 +1209,19 @@ function(latex_add_convert_command
       message(STATUS "Consider getting pdftops from Poppler to convert PDF images to EPS images.")
       set(convert_flags ${flags})
     endif()
+  elseif(${input_extension} STREQUAL ".svg" AND ${output_extension} STREQUAL ".pdf")
+    message(STATUS "SVG -> PDF conversion")
+    if(INKSCAPE_CONVERTER)
+      set(require_imagemagick_convert FALSE)
+      set(require_inkscape_convert TRUE)
+      set(converter ${INKSCAPE_CONVERTER})
+      # For most of our projects, we need to export svg's drawing area to PDF
+      set(convert_flags -D -A)
+      #message(STATUS "adding custom command " ${output_path} " " ${output_file} " " ${input_path} " " ${input_file})
+    else()
+      message(STATUS "Consider getting inkscape to convert SVG images to PDF images.")
+      set(convert_flags ${flags})
+    endif()
   else()
     set(convert_flags ${flags})
   endif()
@@ -1224,6 +1244,12 @@ function(latex_add_convert_command
     else()
       message(SEND_ERROR "Could not find convert program. Please download ImageMagick from http://www.imagemagick.org and install.")
     endif()
+  elseif(require_inkscape_convert)
+    add_custom_command(OUTPUT ${output_path}
+      COMMAND ${converter}
+      ARGS ${convert_flags} ${output_path} ${input_path}
+      DEPENDS ${input_path}
+      )
   else() # Not ImageMagick convert
     add_custom_command(OUTPUT ${output_path}
       COMMAND ${converter}
