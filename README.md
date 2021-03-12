@@ -40,3 +40,15 @@ repository and distribution. Nobody thinks this is a bad idea, but it
 hasn't yet happened mostly out of laziness. Keep bugging me to show
 interest in moving UseLATEX.cmake. (See the author contact information at
 the top of [UseLATEX.cmake](UseLATEX.cmake).)
+
+## Inkscape support
+
+By default, `convert` from ImageMagick is used to convert svg to pdf, which
+ruins the quality. If you need to convert using `inkscape` instead, you can use
+this cmake file. By default, it passes `-D -A` flags to inkscape which converts
+the drawing area (`-D`) of the svg into PDF (`-A image.pdf`). If you need to
+export it differently, modify the flags in the [UseLATEX.cmake](UseLATEX.cmake)
+file (seach for `inkscape`).
+
+## TODO
+* Add support for gnuplot
