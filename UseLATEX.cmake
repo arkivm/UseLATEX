@@ -959,7 +959,8 @@ function(latex_setup_variables)
   latex_wantit(PDFTOPS_CONVERTER pdftops)
   latex_wantit(INKSCAPE_CONVERTER inkscape)
 
-  set(LATEX_COMPILER_FLAGS "-interaction=batchmode -file-line-error"
+  # XXX: Is there any other meaningful way to append user vars with this flag?
+  set(LATEX_COMPILER_FLAGS ${LATEX_COMPILER_FLAGS} "-interaction=batchmode -file-line-error"
     CACHE STRING "Flags passed to latex.")
   set(PDFLATEX_COMPILER_FLAGS ${LATEX_COMPILER_FLAGS}
     CACHE STRING "Flags passed to pdflatex.")
